@@ -1,3 +1,6 @@
+create database Rios;
+USE Rios;
+
 ---tablas proyecto bases II.
 
 create table poblado(
@@ -12,7 +15,7 @@ constraint pobladoFK foreign key (idCanton) references Canton (id) on delete cas
 );
 
 
-create table Region(
+create table Region (
 
 id int      identity (1,1),
 nombre      varchar(30) not null,
