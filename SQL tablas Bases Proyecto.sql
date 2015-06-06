@@ -113,14 +113,35 @@ select provincia, geom.STIsValid()
 from   provincias
 
 update provincias
-set    geom = geom.MakeValid()
-
+set    geom = geom.MakeValid();
 
 update provincias 
 set    geom = geom.STUnion(geom.STStartPoint());
 
-
-create index prov_index_geom on provincias(geom)
-
 update provincias
-set    geom = geom.STBuffer(0.00001).STBuffer(-0.00001)
+set    geom = geom.STBuffer(0.00001).STBuffer(-0.00001);
+
+
+--Forma de ver las dimensiones, visualmente se pueden sacar los boundingbox NO LA MEJOR FORMA--
+select provincia, geom.STEnvelope().ToString() as boundingbox
+from dbo.provincias
+
+
+--Provincias se llama la tabla temporal que cree al ingresar el archivo shape de provincias
+--Creo 4 columnas nuevas, con el min y max de cada poligono.
+alter table provincias
+add 
+MinX as (convert(int, geom.STEnvelope().STPointN((1)).STX,0)) PERSISTED,
+MinY as (convert(int, geom.STEnvelope().STPointN((1)).STY,0)) PERSISTED,
+MaxX as (convert(int, geom.STEnvelope().STPointN((3)).STX,0)) PERSISTED,
+MaxY as (convert(int, geom.STEnvelope().STPointN((3)).STY,0)) PERSISTED;
+
+--Con esta consulta encuentro los minimos y maximos para los boundingbox 
+--FORMA OPTIMA PARA SACAR LOS BOUNDING BOXES
+select 
+MIN(MinX) as MinX,
+MIN (MinY) as MinY,
+MAX (MaxX) as MaxX,
+MAX (MaxY) as MaxY
+from provincias;
+
