@@ -1,19 +1,20 @@
 create database ProyectoRios;
 USE ProyectoRios;
 
+USE BD2_user11
 ---tablas proyecto bases II.
 
 create table Rios ( 
 id int  identity (1,1),
 nombre varchar(30),
-geometria geography check (geometria.STGeometryType() = 'Line') not null,
+geometria geometry check (geometria.STGeometryType() = 'Line') not null,
 constraint PKrios primary key(id));
 
 create table Provincia (
 id int not null, 
 nombre varchar(30),
 area int, 
-geometria geography check(geometria.STGeometryType() = 'MultiPolygon') not null,
+geometria geometry check(geometria.STGeometryType() = 'MultiPolygon') not null,
 constraint PKprovincia primary key(id)
 );
 
@@ -23,7 +24,7 @@ create table Canton (
 	pob_200h int,
 	pob_200m int, 
 	areacanton int, 
-	geometria geography check(geometria.STGeometryType() = 'MultiPolygon') not null, 
+	geometria geometry check(geometria.STGeometryType() = 'MultiPolygon') not null, 
 	FKidprovincia int,
 	constraint PKcanton primary key(id),
 	constraint FKcanton foreign key (FKidprovincia) references Provincia (id) on delete cascade on update cascade
@@ -40,7 +41,7 @@ constraint FKinfraestructura foreign key(id_Canton_Infraestructura) references C
 create table Poblado(
 id int    identity (1,1),
 nombre    varchar(30),
-geometria geography check(geometria.STGeometryType() = 'Point') not null,
+geometria geometry check(geometria.STGeometryType() = 'Point') not null,
 FKidCanton  int,
 constraint PKpoblado primary key(id),
 constraint FKpoblado foreign key (FKidCanton) references Canton (id) on delete cascade on update cascade
@@ -50,7 +51,7 @@ create table Region (
 id int not null,
 nombre      varchar(30) not null,
 viviendas_O int,
-geometria   geography check(geometria.STGeometryType() = 'MultiPolygon') not null,
+geometria   geometry check(geometria.STGeometryType() = 'MultiPolygon') not null,
 constraint PKregion primary key(id),
 );
 
@@ -70,7 +71,7 @@ create table GeneracionElectrica (
 	capacidad int check(capacidad >= 0),
 	propiedad varchar(30),
 	estado varchar(30),
-	geometria geography check(geometria.STGeometryType() = 'Point') not null,
+	geometria geometry check(geometria.STGeometryType() = 'Point') not null,
 	
 	constraint PKGeneracionElectrica primary key(id)
 );
@@ -102,3 +103,24 @@ cantidad int,
 constraint PKServElectricidad primary key (id_RegionFK),
 constraint FKServElectricidad foreign key(id_RegionFK) references Region(id)
 );
+
+
+
+select * from provincias where provincia = 'Guanacaste'
+
+
+select provincia, geom.STIsValid()
+from   provincias
+
+update provincias
+set    geom = geom.MakeValid()
+
+
+update provincias 
+set    geom = geom.STUnion(geom.STStartPoint());
+
+
+create index prov_index_geom on provincias(geom)
+
+update provincias
+set    geom = geom.STBuffer(0.00001).STBuffer(-0.00001)
