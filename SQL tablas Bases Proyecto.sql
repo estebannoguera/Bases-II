@@ -30,7 +30,7 @@ create table Canton (
 );
 
 create table Infraestructura(
-id_Canton_Infraestructura int not null,
+id_Canton_Infraestructura int identity (1,1) not null,
 tipo      varchar(45) not null,
 cantidad  int check(cantidad > 0),
 constraint PKinfraestructura primary key(id_Canton_Infraestructura),
@@ -118,7 +118,7 @@ set    geom = geom.STBuffer(0.00001).STBuffer(-0.00001);
 
 --Forma de ver las dimensiones, visualmente se pueden sacar los boundingbox NO LA MEJOR FORMA--
 select provincia, geom.STEnvelope().ToString() as boundingbox
-from ProvinciaShape
+from ProvinciaShape;
 
 
 --Provincias se llama la tabla temporal que cree al ingresar el archivo shape de provincias
