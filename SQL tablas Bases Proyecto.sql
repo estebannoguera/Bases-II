@@ -1,7 +1,6 @@
 create database ProyectoRios;
 USE ProyectoRios;
 
-USE BD2_user11
 ---tablas proyecto bases II.
 
 create table Rios ( 
@@ -104,32 +103,27 @@ constraint PKServElectricidad primary key (id_RegionFK),
 constraint FKServElectricidad foreign key(id_RegionFK) references Region(id)
 );
 
+select provincia, geom.STIsValid(), geom
+from   ProvinciaShape;
 
-
-select * from provincias where provincia = 'Guanacaste'
-
-
-select provincia, geom.STIsValid()
-from   provincias
-
-update provincias
+update ProvinciaShape
 set    geom = geom.MakeValid();
 
-update provincias 
+update ProvinciaShape 
 set    geom = geom.STUnion(geom.STStartPoint());
 
-update provincias
+update ProvinciaShape
 set    geom = geom.STBuffer(0.00001).STBuffer(-0.00001);
 
 
 --Forma de ver las dimensiones, visualmente se pueden sacar los boundingbox NO LA MEJOR FORMA--
 select provincia, geom.STEnvelope().ToString() as boundingbox
-from dbo.provincias
+from ProvinciaShape
 
 
 --Provincias se llama la tabla temporal que cree al ingresar el archivo shape de provincias
 --Creo 4 columnas nuevas, con el min y max de cada poligono.
-alter table provincias
+alter table ProvinciaShape
 add 
 MinX as (convert(int, geom.STEnvelope().STPointN((1)).STX,0)) PERSISTED,
 MinY as (convert(int, geom.STEnvelope().STPointN((1)).STY,0)) PERSISTED,
@@ -143,5 +137,27 @@ MIN(MinX) as MinX,
 MIN (MinY) as MinY,
 MAX (MaxX) as MaxX,
 MAX (MaxY) as MaxY
-from provincias;
+from ProvinciaShape;
 
+select *
+from   ProvinciaShape;
+
+
+select provincia, geom.ToString() as boundingbox
+from ProvinciaShape;
+
+DECLARE @g geometry;
+SET @g = geometry::Parse('MULTIPOLYGON(((0 0, 0 3, 3 3, 3 0, 0 0), (1 1, 1 2, 2 1, 1 1)), ((9 9, 9 10, 10 9, 9 9)))');
+SELECT @g.STGeometryN(2).STAsText();
+
+
+select Nombre, geom.STIsValid(), geom
+from   GenElecShape;
+
+select *
+from   GenElecShape;
+
+
+insert into GeneracionElectrica (nombre, empresa, tipo, capacidad, propiedad, estado, geometria)
+select nombre, empresa, tipo, capacidad, propiedad, estado, geom
+from GenElecShape 
