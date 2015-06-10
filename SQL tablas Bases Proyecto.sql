@@ -161,3 +161,4 @@ from   GenElecShape;
 insert into GeneracionElectrica (nombre, empresa, tipo, capacidad, propiedad, estado, geometria)
 select nombre, empresa, tipo, capacidad, propiedad, estado, geom
 from GenElecShape 
+
