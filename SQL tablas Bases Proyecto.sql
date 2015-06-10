@@ -179,3 +179,52 @@ SET Geometria = @geometria_v
 WHERE p.Nombre = @Nombre
 END
 
+--correcciones de las geometrias
+
+CREATE TRIGGER corregirGeom_Prov
+ON provincia p
+AFTER INSERT, UPDATE
+AS
+BEGIN
+DECLARE @geometria Geometry,
+@Nombre Nchar(40);
+SELECT @Nombre = p.Nombre, @geometria = p.geometria
+FROM INSERTED
+IF @geometria.STIsValid()=0
+SET @geometria = @geometria.MakeValid();
+UPDATE p.geometria
+SET p.geometria = @geometria
+WHERE p.Nombre = @Nombre
+END
+
+CREATE TRIGGER corregirGeom_Poblado
+ON Poblado p
+AFTER INSERT, UPDATE
+AS
+BEGIN
+DECLARE @geometria Geometry,
+@Nombre Nchar(40);
+SELECT @Nombre = p.Nombre, @geometria = p.geometria
+FROM INSERTED
+IF @geometria.STIsValid()=0
+SET @geometria = @geometria.MakeValid();
+UPDATE p.geometria
+SET p.geometria = @geometria
+WHERE p.Nombre = @Nombre
+END
+
+CREATE TRIGGER corregirGeom_Region
+ON Region r
+AFTER INSERT, UPDATE
+AS
+BEGIN
+DECLARE @geometria Geometry,
+@Nombre Nchar(40);
+SELECT @Nombre = r.Nombre, @geometria = r.geometria
+FROM INSERTED
+IF @geometria.STIsValid()=0
+SET @geometria = @geometria.MakeValid();
+UPDATE r.geometria
+SET r.geometria = @geometria
+WHERE p.Nombre = @Nombre
+END
