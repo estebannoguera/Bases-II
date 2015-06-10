@@ -228,3 +228,37 @@ UPDATE r.geometria
 SET r.geometria = @geometria
 WHERE p.Nombre = @Nombre
 END
+
+CREATE TRIGGER corregirGeom_Canton
+ ON canton c
+ AFTER INSERT, UPDATE
+AS
+BEGIN
+ DECLARE @geometria Geometry,
+ @Nombre Nchar(40);
+ SELECT @Nombre = c.nombre, @cantones = c.geometria
+ FROM cantones c
+ IF @cantones.STIsValid()=0
+ SET @cantones = @cantones.MakeValid();
+
+ UPDATE c.geometria
+ SET p.geometria = @cantones_shp
+ WHERE c.nombre = @Nombre
+END
+
+CREATE TRIGGER corregirGeom_GenElectrica
+ ON  generacionelectrica ge 
+ AFTER INSERT, UPDATE
+AS
+BEGIN
+ DECLARE @geometry Geometry,
+ @Nombre Nchar(40);
+ SELECT @Nombre = g.nombre, @cantones = g.geometria
+ FROM generacionelectrica g
+ IF @cantones.STIsValid()=0
+ SET @cantones = @cantones.MakeValid();
+
+ UPDATE g.geometria
+ SET g.geometria = @cantones
+ WHERE g.nombre = @Nombre
+END
