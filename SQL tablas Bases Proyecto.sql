@@ -162,3 +162,20 @@ insert into GeneracionElectrica (nombre, empresa, tipo, capacidad, propiedad, es
 select nombre, empresa, tipo, capacidad, propiedad, estado, geom
 from GenElecShape 
 
+CREATE TRIGGER corregirGeom_Rios
+ON Rios r
+AFTER INSERT, UPDATE
+AS
+BEGIN
+DECLARE @geometria_v Geometry,
+@Nombre Nchar(40);
+SELECT @Nombre = r.Nombre, @geometria_v = r.geometria
+FROM INSERTED
+
+IF @geometria_v.STIsValid()=0
+SET @geometria_v = @geometria_v.MakeValid();
+UPDATE r.geometria
+SET Geometria = @geometria_v
+WHERE p.Nombre = @Nombre
+END
+
